@@ -1,0 +1,9 @@
+Członkowie grupy:
+(1) Piotr Polak, 407556
+(2) Dominik Salabura, 405762
+(3) Bartosz Ryczak, 407483
+(4) Jakub Sacha, 405521
+
+Kierownik grupy: Dominik Salabura
+
+URL repozytorium: https://github.com/Piotrek12332121/NETSIM.git
