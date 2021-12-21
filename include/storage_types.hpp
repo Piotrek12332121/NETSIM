@@ -1,8 +1,6 @@
 #ifndef LAB7_STORAGE_TYPES_HPP
 #define LAB7_STORAGE_TYPES_HPP
 
-#endif //LAB7_STORAGE_TYPES_HPP
-
 class IPackageStockpile{
 public:
     using const_iterator = std::list<Package>::const_iterator;
@@ -18,3 +16,5 @@ public:
 
     virtual ~IPackageStockpile() {};
 };
+
+#endif //LAB7_STORAGE_TYPES_HPP
