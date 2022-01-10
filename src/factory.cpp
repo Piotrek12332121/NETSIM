@@ -3,6 +3,18 @@
 
 #include <stdexcept>
 
+void Factory::remove_worker(ElementID id) {
+    for (auto& ramp : ramps_) {
+        for (auto p : ramp.receiver_preferences_.get_preferences()) {
+            if (p.first->get_id() == id && p.first->get_receiver_type() == ReceiverType::WORKER) {
+                ramp.receiver_preferences_.remove_receiver(p.first);
+                break;
+            }
+        }
+    }
+    workers_.remove_by_id(id);
+}
+
 enum class NodeColor { UNVISITED, VISITED, VERIFIED };
 
 bool has_reachable_storehouse(const PackageSender* sender, std::map<const PackageSender*, NodeColor>& node_colors) {
@@ -59,3 +71,27 @@ bool has_reachable_storehouse(const PackageSender* sender, std::map<const Packag
 
         return true;
     }
+
+void Factory::do_deliveries(Time t) {
+    for(auto& ramp : ramps_) {
+        ramp.deliver_goods(t);
+    }
+}
+
+void Factory::do_package_passing() {
+
+    for(auto& ramp : ramps_) {
+        ramp.send_package();
+    }
+
+    for(auto& worker : workers_) {
+        worker.send_package();
+    }
+
+}
+
+void Factory::do_work(Time t) {
+    for(auto& worker : workers_){
+        worker.do_work(t);
+    }
+}

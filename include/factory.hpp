@@ -40,6 +40,21 @@ private:
 class Factory{
 public:
     bool is_consistent();
+
+    void do_deliveries(Time t);
+
+    void do_package_passing();
+
+    void do_work(Time t);
+
+private:
+    NodeCollection <Worker> workers_;
+    NodeCollection <Storehouse> storehouses_;
+    NodeCollection <Ramp> ramps_;
+
+    template<class Node>
+    void remove_receiver(NodeCollection<Node>& collection, ElementID id) {collection.remove_by_id(id);}
+
 };
 
 #endif //NETSIM_FACTORY_HPP
