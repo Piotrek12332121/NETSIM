@@ -1,0 +1,15 @@
+PRZYDZIAŁ ZADAŃ - PÓŁPRODUKTY I ICH PRZECHOWANIE
+================================================================================
+Piotr:
+- IPackegeQueue
+- PackageQueueType
+--------------------
+Dominik:
+- Package
+- ElementID
+--------------------
+Bartosz:
+- IPackageStockpile
+--------------------
+Jakub:
+- PackageQueue
