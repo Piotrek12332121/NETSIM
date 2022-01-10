@@ -1,7 +1,51 @@
-#include "types.hpp"
-
 #ifndef NETSIM_NODES_HPP
 #define NETSIM_NODES_HPP
+
+#include "types.hpp"
+
+#include <memory>
+
+enum class ReceiverType{
+    WORKER = 0,
+    STOREHOUSE = 1
+};
+
+
+class IPackageReceiver{
+public:
+    virtual void receive_package(Package&& p) = 0;
+    virtual ElementID get_id() const = 0;
+    virtual ~IPackageReceiver() = default;
+
+
+    virtual ReceiverType get_receiver_type() const = 0;
+};
+
+
+class Storehouse : public IPackageReceiver, public IPackageStockpile{
+public:
+    Storehouse(ElementID id, std::unique_ptr<IPackageStockpile> d =
+            std::make_unique<PackageQueue>(PackageQueueType::LIFO)) :
+            id_(id), ptr_(std::move(d)) {};
+
+    Storehouse(Storehouse&&) = default;
+
+    IPackageStockpile::iterator begin() override {return ptr_->begin();}
+    IPackageStockpile::const_iterator cbegin() const override {return ptr_->cbegin();}
+    IPackageStockpile::iterator end() override {return ptr_->end();}
+    IPackageStockpile::const_iterator cend() const override {return ptr_->cend();}
+
+    void receive_package(Package&& p) override {ptr_->push(std::move(p));}
+    ElementID get_id() const override {return id_;}
+    ~Storehouse() override = default;
+
+
+    ReceiverType get_receiver_type() const override {return ReceiverType::STOREHOUSE;}
+private:
+    ElementID id_;
+    std::unique_ptr<IPackageStockpile> ptr_;
+};
+
 
 class Ramp : public PackageSender {
 public:

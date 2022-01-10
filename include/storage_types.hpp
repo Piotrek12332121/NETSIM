@@ -9,14 +9,15 @@
 class IPackageStockpile{
 public:
     using const_iterator = std::list<Package>::const_iterator;
+    using iterator = std::list<Package>::iterator;
 
     virtual void push(Package&& aPackage) = 0;
     virtual bool empty() const = 0;
     virtual size_t size() const = 0;
 
-    virtual std::list<Package>::iterator begin() = 0;
+    virtual iterator begin() = 0;
     virtual const_iterator cbegin() const = 0;
-    virtual std::list<Package>::iterator end() = 0;
+    virtual iterator end() = 0;
     virtual const_iterator cend() const = 0;
 
     virtual ~IPackageStockpile() {};
@@ -31,9 +32,9 @@ public:
     Package pop() override;
     PackageQueueType get_queue_type() override {return queue_type_;}
 
-    const_iterator begin() const override {return queue_.begin();}
+    iterator begin() override {return queue_.begin();}
     const_iterator cbegin() const override {return queue_.cbegin();}
-    const_iterator end() const override {return queue_.end();}
+    iterator end() override {return queue_.end();}
     const_iterator cend() const override {return queue_.cend();}
 
 private:

@@ -1,17 +1,18 @@
+#ifndef LAB7_PACKAGE_HPP
+#define LAB7_PACKAGE_HPP
+
 #include "types.hpp"
 
 #include <set>
 
-#ifndef LAB7_PACKAGE_HPP
-#define LAB7_PACKAGE_HPP
-
 class Package{
+    using ElementID = int;
 public:
     Package();  // Konstruktor domyślny
-    Package(const ElementID& id) :  id_(id) {} // Konstruktor na podstawie ID do raportów
-    Package(const Package&& diff_package) : id_(diff_package.id_) {}    // Konstruktor kopiujący
+    explicit Package(const ElementID& id) :  id_(id) {} // Konstruktor na podstawie ID do raportów
+    Package(const Package&& diff_package)  noexcept : id_(diff_package.id_) {}    // Konstruktor kopiujący
 
-    Package& operator= (Package&& diff_package);    // Przeciążony operator "="
+    Package& operator= (Package&& diff_package) noexcept; // Przeciążony operator "="
 
     ElementID get_id() const { return id_; }  // Getter ID
 

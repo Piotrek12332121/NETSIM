@@ -25,7 +25,7 @@ Package::Package() {
 }
 
 // Przeciążony operator "=" klasy Package
-Package& Package::operator= (Package&& diff_package) {
+Package& Package::operator= (Package&& diff_package) noexcept {
     assigned_IDs.erase(assigned_IDs.end());
     freed_IDs.insert(id_);
     id_ = diff_package.id_;
