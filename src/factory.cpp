@@ -1,6 +1,7 @@
-#include "factory.hpp"
+#XXX
 
-#include <stdexcept>
+enum class NodeColor { UNVISITED, VISITED, VERIFIED };
+
 
 bool Factory::is_consistent() {
 
