@@ -2,9 +2,9 @@
 #define LAB7_STORAGE_TYPES_HPP
 
 #include "types.hpp"
-#include <list>
 #include "package.hpp"
 
+#include <list>
 
 class IPackageStockpile{
 public:
