@@ -4,7 +4,14 @@
 #include "types.hpp"
 #include "package.hpp"
 
+#include <deque>
+#include <functional>
+#include <iostream>
 #include <list>
+
+enum class PackageQueueType {
+    FIFO, LIFO
+};
 
 class IPackageStockpile{
 public:
@@ -42,4 +49,11 @@ private:
     PackageQueueType queue_type_;
 };
 
+class IPackageQueue : public IPackageStockpile {
+public:
+    virtual PackageQueueType get_queue_type() const = 0;
+    virtual Package pop() = 0;
+private:
+
+};
 #endif //LAB7_STORAGE_TYPES_HPP
