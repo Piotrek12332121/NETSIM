@@ -2,16 +2,20 @@
 #define NETSIM_FACTORY_HPP
 
 #include "types.hpp"
+#include "nodes.hpp"
 
 #include <vector>
 #include <algorithm>
 
+enum class NodeColor { UNVISITED, VISITED, VERIFIED };
+
 template <class Node>
 class NodeCollection{
+public:
     using container_t = typename std::vector<Node>; // Wybranym kontenerem jest std::vector
     using iterator = typename container_t::iterator;
     using const_iterator = typename container_t::const_iterator;
-public:
+
     void add(Node&& node) {
         collection_.push_back(std::move(node));
     }
@@ -37,24 +41,55 @@ private:
     container_t collection_;
 };
 
+
+template <class Node>
 class Factory{
 public:
-    bool is_consistent();
+    bool is_consistent() {
+        std::map<const PackageSender*, NodeColor> color;
 
-    void do_deliveries(Time t);
+        for (auto &r : ramps_) {
+            color.insert(std::pair<*PackageSender, NodeColor>(&r, NodeColor::UNVISITED));
+        }
+        for (auto &w : workers_) {
+            color.insert(std::pair<*PackageSender, NodeColor>(&w, NodeColor::UNVISITED));
+        }
 
-    void do_package_passing();
+        try {
+            for (const auto& r: ramps_) {
+                has_reachable_storehouse(&r, color);
+            }
+        }
+        catch (std::logic_error& ex) {
+            return false;
+        }
+
+        return true;
+    }
+
+    void do_deliveries(Time t) {
+        for(auto& ramp : ramps_) {
+            ramp.deliver_goods(t);
+        }
+    }
+
+    void do_package_passing() {
+        for(auto& ramp : ramps_) {
+            ramp.send_package();
+        }
+
+        for(auto& worker : workers_) {
+            worker.send_package();
+        }
+    }
 
     void do_work(Time t);
-
 private:
     NodeCollection <Worker> workers_;
     NodeCollection <Storehouse> storehouses_;
     NodeCollection <Ramp> ramps_;
 
-    template<class Node>
     void remove_receiver(NodeCollection<Node>& collection, ElementID id) {collection.remove_by_id(id);}
-
 };
 
 #endif //NETSIM_FACTORY_HPP

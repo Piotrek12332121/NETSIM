@@ -2,6 +2,7 @@
 #define NETSIM_NODES_HPP
 
 #include "types.hpp"
+#include "helpers.hpp"
 
 #include <memory>
 
@@ -47,17 +48,6 @@ private:
 };
 
 
-class Ramp : public PackageSender {
-public:
-    Ramp(ElementID id, TimeOffset di) : id_(id), di_(di) {}
-    TimeOffset get_delivery_interval() const {return di_;} // Getter offsetu
-    ElementID get_id() const {return id_;} // Getter ID
-    void deliver_goods(Time t) const { if(t % di_ == 0) { send_package(); } }
-private:
-    ElementID id_; // ID rampy
-    TimeOffset di_; // Czas wykonania pojedyńczej wysyłki
-};
-
 class ReceiverPreferences {
 public:
     ReceiverPreferences(ProbabilityGenerator pg = probability_generator) : pg_(pg) {}
@@ -77,15 +67,24 @@ public:
     const_iterator cbegin() const {return preferences_.cbegin();}
     const_iterator end() const {return preferences_.end();}
     const_iterator cend() const {return preferences_.cend();}
-
 private:
     ProbabilityGenerator pg_;
 
     double n = 0.0;
 
     preferences_t preferences_;
+};
 
 
+class Ramp : public PackageSender {
+public:
+    Ramp(ElementID id, TimeOffset di) : id_(id), di_(di) {}
+    TimeOffset get_delivery_interval() const {return di_;} // Getter offsetu
+    ElementID get_id() const {return id_;} // Getter ID
+    void deliver_goods(Time t) const { if(t % di_ == 0) { send_package(); } }
+private:
+    ElementID id_; // ID rampy
+    TimeOffset di_; // Czas wykonania pojedyńczej wysyłki
 };
 
 #endif //NETSIM_NODES_HPP

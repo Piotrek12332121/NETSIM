@@ -1,8 +1,7 @@
 #include "nodes.hpp"
-<<<<<<< HEAD
-
-=======
 #include "helpers.hpp"
+
+#include <algorithm>
 
 
 void ReceiverPreferences::add_receiver(IPackageReceiver* r) {
@@ -49,4 +48,3 @@ IPackageReceiver* ReceiverPreferences::choose_receiver() {
 const preferences_t& ReceiverPreferences::get_preferences() const{
     return preferences_;
 }
->>>>>>> 09ae921aab40367b92bf2f0929f9dfe3e67567e2
