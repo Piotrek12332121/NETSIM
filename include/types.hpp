@@ -8,5 +8,6 @@ using ElementID = int;
 
 using TimeOffset = int;
 using Time = int;
+using ProbabilityGenerator = std::function<double(void)>;
 
 #endif //LAB7_TYPES_HPP
