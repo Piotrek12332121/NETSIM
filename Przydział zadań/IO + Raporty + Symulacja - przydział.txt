@@ -1,0 +1,20 @@
+PRZYDZIAŁ ZADAŃ - IO + Raporty + Symulacja
+================================================================================
+Piotr:
+- Worker::get_queue [IO]
+- Worker::get_procesing_buffer [R]
+--------------------
+Dominik:
+- funkcje Raporting:
+	* generate_structure_report [R]
+	* generate_simulation_turn_report [R]
+- IntervalRaportNotfier [S]
+- SpecificTurnsReportNotifier [S] 
+--------------------
+Bartosz:
+- funkcje IO:
+	* load_factory_structure [IO]
+	* save_factory_structure [IO]
+--------------------
+Jakub:
+- simulate [S]
