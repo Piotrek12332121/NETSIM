@@ -83,7 +83,12 @@ public:
         }
     }
 
-    void do_work(Time t);
+    void Factory::do_work(Time t) {
+        for(auto& i: workers_)
+        {
+            i.do_work(t);
+        }
+    }
 private:
     NodeCollection <Worker> workers_;
     NodeCollection <Storehouse> storehouses_;

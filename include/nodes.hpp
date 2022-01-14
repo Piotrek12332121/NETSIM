@@ -23,6 +23,7 @@ public:
 };
 
 
+
 class Storehouse : public IPackageReceiver, public IPackageStockpile{
 public:
     Storehouse(ElementID id, std::unique_ptr<IPackageStockpile> d =
@@ -75,6 +76,39 @@ private:
     preferences_t preferences_;
 };
 
+class PackageSender   //TODO: do poprawy wysypuje std::optional
+{
+public:
+    //PackageSender(PackageSender&&)=default;
+    void send_package()
+    {
+        if(bucket)
+        {
+            IPackageReceiver* receiver =receiver_preferences_.choose_receiver();
+            receiver->receive_package(std::move(*bucket));
+            bucket.reset();
+        }
+    }
+    std::optional<Package> get_sending_buffer()
+    {
+        return bucket;
+    }
+    bool buffer_empty()
+    {
+        if(bucket) return true;
+        else return false;
+    }
+    ReceiverPreferences receiver_preferences_;
+protected:
+    void push_package(Package &&package)
+    {
+        bucket=std::move(package);
+    }
+
+private:
+    std::optional<Package> bucket;
+};
+
 
 class Ramp : public PackageSender {
 public:
@@ -85,6 +119,68 @@ public:
 private:
     ElementID id_; // ID rampy
     TimeOffset di_; // Czas wykonania pojedyńczej wysyłki
+};
+
+
+class Worker : public PackageSender, public IPackageReceiver
+{
+public:
+    using queue_t=std::unique_ptr<PackageQueue>;
+
+    Worker(ElementID id, TimeOffset pd, std::unique_ptr<PackageQueue> q) //TODO:ogarnąc pola składowe
+    {
+        id_=id;
+        pd_=pd;
+        queue=std::move(q);
+        starttime=0;
+        processing=std::nullopt;
+
+    }
+    void do_work(Time t)
+    {
+
+        if(!queue->empty() && !processing)
+        {
+            processing=queue->pop();
+            starttime=t;
+        }
+
+        if (t-starttime==pd_-1  && processing)
+        {
+            push_package(std::move(*processing));
+            processing.reset();
+        }
+        void receive_package(Package &&p)
+        {
+
+            queue->push(std::move(p));
+        }
+
+    // TODO: ReceiverType get_receiver_type(){ return ReceiverType::WORKER; };
+        TimeOffset Worker::get_processing_duration()
+        {
+            return pd_;
+        }
+        Time get_package_processing_start_time()
+        {
+            return starttime;
+        }
+        ElementID Worker::get_id() const
+        {
+            return id_;
+        }
+
+    const_iterator begin() const { return queue->cbegin(); };
+    const_iterator end() const { return queue->cend();};
+    const_iterator cbegin() const { return queue->cbegin();};
+    const_iterator cend() const { return queue->cend();};
+
+private:
+    ElementID id_;
+    TimeOffset pd_;
+    std::unique_ptr<PackageQueue> queue;
+    Time starttime;
+    std::optional<Package> processing;
 };
 
 #endif //NETSIM_NODES_HPP
