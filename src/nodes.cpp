@@ -2,12 +2,42 @@
 #include "helpers.hpp"
 
 #include <algorithm>
+#include <memory>
+#include <optional>
 
+void PackageSender::send_package(){
+    if(bucket){
+        IPackageReceiver* receiver = receiver_preferences_.choose_receiver();
+        receiver->receive_package(std::move(*bucket));
+        bucket.reset();
+    }
+}
+
+void Worker::do_work(Time t) {
+
+    if (!queue->empty() && !processing) {
+        processing = queue->pop();
+        starttime = t;
+    }
+
+    if (t - starttime == pd_ - 1 && processing) {
+        push_package(std::move(*processing));
+        processing.reset();
+    }
+}
+
+Worker::Worker(ElementID id, TimeOffset pd, std::unique_ptr<PackageQueue> q) {
+    id_ = id;
+    pd_ = pd;
+    queue = std::move(q);
+    starttime = 0;
+    processing = std::nullopt;
+}
 
 void ReceiverPreferences::add_receiver(IPackageReceiver* r) {
     double old_ratio = n;
     n += 1.0;
-    preferences_t receiver_to_add{ {std::move(r), 1.0/n} };
+    preferences_t receiver_to_add{ {r, 1.0/n} };
 
     if (!preferences_.empty()) {
         double factor_scale = old_ratio / n;
@@ -41,10 +71,4 @@ IPackageReceiver* ReceiverPreferences::choose_receiver() {
         }
     }
     return nullptr;
-}
-
-
-
-const preferences_t& ReceiverPreferences::get_preferences() const{
-    return preferences_;
 }

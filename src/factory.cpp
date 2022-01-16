@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 
-bool has_reachable_storehouse(const PackageSender* sender, std::map<const PackageSender*, NodeColor>& node_colors) {
+bool Factory::has_reachable_storehouse(const PackageSender* sender, std::map<const PackageSender*, NodeColor>& node_colors) const {
     if (node_colors.at(sender) == NodeColor::VERIFIED) {
         return true;
     }
@@ -31,5 +31,49 @@ bool has_reachable_storehouse(const PackageSender* sender, std::map<const Packag
                 has_reachable_storehouse(sendrecv_ptr, node_colors);
             }
         }
+    }
+}
+
+bool Factory::is_consistent() const {
+    std::map<const PackageSender*, NodeColor> color;
+
+    for (auto &r : ramps_) {
+        color.insert(std::pair<*PackageSender, NodeColor>(&r, NodeColor::UNVISITED));
+    }
+    for (auto &w : workers_) {
+        color.insert(std::pair<*PackageSender, NodeColor>(&w, NodeColor::UNVISITED));
+    }
+
+    try {
+        for (const auto& r: ramps_) {
+            has_reachable_storehouse(&r, color);
+        }
+    }
+    catch (std::logic_error& ex) {
+        return false;
+    }
+
+    return true;
+}
+
+void Factory::do_deliveries(Time t) {
+    for(auto& ramp : ramps_) {
+        ramp.deliver_goods(t);
+    }
+}
+
+void Factory::do_package_passing() {
+    for(auto& ramp : ramps_) {
+        ramp.send_package();
+    }
+
+    for(auto& worker : workers_) {
+        worker.send_package();
+    }
+}
+
+void Factory::do_work(Time t) {
+    for(auto& worker: workers_){
+        worker.do_work(t);
     }
 }
