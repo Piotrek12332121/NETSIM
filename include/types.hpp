@@ -10,4 +10,9 @@ using TimeOffset = int;
 using Time = int;
 using ProbabilityGenerator = std::function<double(void)>;
 
+enum class ReceiverType{
+    WORKER = 0,
+    STOREHOUSE = 1
+};
+
 #endif //LAB7_TYPES_HPP

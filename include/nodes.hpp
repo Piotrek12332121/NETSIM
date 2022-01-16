@@ -8,11 +8,6 @@
 #include <memory>
 #include <optional>
 
-enum class ReceiverType{
-    WORKER = 0,
-    STOREHOUSE = 1
-};
-
 
 class IPackageReceiver{
 public:
