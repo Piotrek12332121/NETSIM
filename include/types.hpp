@@ -2,6 +2,7 @@
 #define LAB7_TYPES_HPP
 
 #include "storage_types.hpp"
+#include <functional>
 #include <map>
 
 using ElementID = int;

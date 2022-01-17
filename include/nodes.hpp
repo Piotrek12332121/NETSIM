@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <optional>
+#include <utility>
 
 
 class IPackageReceiver{
@@ -50,7 +51,7 @@ private:
 
 class ReceiverPreferences {
 public:
-    explicit ReceiverPreferences(ProbabilityGenerator pg = probability_generator) : pg_(pg) {}
+    explicit ReceiverPreferences(ProbabilityGenerator pg = probability_generator) : pg_(std::move(pg)) {}
 
     using preferences_t = std::map<IPackageReceiver*, double>;
     using const_iterator = preferences_t::const_iterator;
@@ -78,6 +79,7 @@ class PackageSender   //TODO: do poprawy wysypuje std::optional
 {
 public:
     //PackageSender(PackageSender&&)=default;
+
     void send_package();
 
     [[nodiscard]] std::optional<Package> get_sending_buffer() const {return bucket;}
@@ -85,10 +87,7 @@ public:
     ReceiverPreferences receiver_preferences_;
 
 protected:
-    void push_package(Package &&package)
-    {
-        bucket=std::move(package);
-    }
+    void push_package(Package &&package) { bucket = std::move(package); }
 
 private:
     std::optional<Package> bucket;

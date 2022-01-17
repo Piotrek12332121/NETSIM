@@ -42,22 +42,22 @@ private:
 
 class Factory{
 public:
-    void add_ramp(Ramp&&);
-    void remove_ramp(ElementID id);
+    void add_ramp(Ramp&& r) {ramps_.add(std::move(r));}
+    void remove_ramp(ElementID id) {ramps_.remove_by_id(id);}
     NodeCollection<Ramp>::iterator find_ramp_by_id(ElementID id) {return ramps_.find_by_id(id);}
     [[nodiscard]] NodeCollection<Ramp>::const_iterator find_ramp_by_id(ElementID id) const {return ramps_.find_by_id(id);}
     [[nodiscard]] NodeCollection<Ramp>::const_iterator ramp_cbegin() const {return ramps_.begin();}
     [[nodiscard]] NodeCollection<Ramp>::const_iterator ramp_cend() const {return ramps_.cend();}
 
-    void add_worker(Worker&&);
-    void remove_worker(ElementID id);
+    void add_worker(Worker&& w) { workers_.add(std::move(w)); }
+    void remove_worker(ElementID id) {workers_.remove_by_id(id);}
     NodeCollection<Worker>::iterator find_worker_by_id(ElementID id) {return workers_.find_by_id(id);}
     [[nodiscard]] NodeCollection<Worker>::const_iterator find_worker_by_id(ElementID id) const {return workers_.find_by_id(id);}
     [[nodiscard]] NodeCollection<Worker>::const_iterator worker_cbegin() const {return workers_.begin();}
     [[nodiscard]] NodeCollection<Worker>::const_iterator worker_cend() const {return workers_.begin();}
 
-    void add_storehouse(Storehouse&&);
-    void remove_storehouse(ElementID id);
+    void add_storehouse(Storehouse&& s) {storehouses_.add(std::move(s));}
+    void remove_storehouse(ElementID id) {storehouses_.remove_by_id(id);}
     NodeCollection<Storehouse>::iterator find_storehouse_by_id(ElementID id) {return storehouses_.find_by_id(id);}
     [[nodiscard]] NodeCollection<Storehouse>::const_iterator find_storehouse_by_id(ElementID id) const {return storehouses_.find_by_id(id);}
     [[nodiscard]] NodeCollection<Storehouse>::const_iterator storehouse_cbegin() const {return storehouses_.begin();}

@@ -1,6 +1,6 @@
 #include "simulation.hpp"
 
-void simulate(Factory& f, TimeOffset d, std::function<void (Factory&, Time)> rf){
+void simulate(Factory& f, TimeOffset d, const std::function<void (Factory&, Time)>& rf){
     if (f.is_consistent()) {
         for (Time i = 1; i <= d; i++) {
             f.do_deliveries(i);

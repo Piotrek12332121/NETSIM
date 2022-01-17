@@ -127,19 +127,19 @@ Factory load_factory_structure(std::istream& is){
                     receiver_id = destination_pair.substr(i + 1, destination_pair.size() - i - 1);
                 }
             }
-            if (source_type == "ramp" && receiver_type == 'worker') {
+            if (source_type == "ramp" && receiver_type == "worker") {
                 Ramp& r - *(factory.find_ramp_by_id(std::stoi(source_id)));
                 r.receiver_preferences_.add_receiver(&(*(factory.find_worker_by_id(std::stoi(receiver_id)))));
             }
-            else if (source_type == "ramp" && receiver_type == 'store') {
+            else if (source_type == "ramp" && receiver_type == "store") {
                 Ramp& r - *(factory.find_ramp_by_id(std::stoi(source_id)));
                 r.receiver_preferences_.add_receiver(&(*(factory.find_storehouse_by_id(std::stoi(receiver_id)))));
             }
-            else if (source_type == "worker" && receiver_type == 'worker') {
+            else if (source_type == "worker" && receiver_type == "worker") {
                 Worker& w - *(factory.find_worker_by_id(std::stoi(source_id)));
                 r.receiver_preferences_.add_receiver(&(*(factory.find_worker_by_id(std::stoi(receiver_id)))));
             }
-            else if (source_type == "worker" && receiver_type == 'store') {
+            else if (source_type == "worker" && receiver_type == "store") {
                 Worker& w - *(factory.find_worker_by_id(std::stoi(source_id)));
                 r.receiver_preferences_.add_receiver(&(*(factory.find_storehouse_by_id(std::stoi(receiver_id)))));
             }
@@ -186,5 +186,5 @@ void save_factory_structure(Factory& factory, std::ostream& os) {
     for(auto it = factory.worker_cbegin(); it != factory.worker_cend(); ++it) {
         make_connection(*it, os);
     }
-    os.flush()
+    os.flush();
 }

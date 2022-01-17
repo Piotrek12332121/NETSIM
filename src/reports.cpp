@@ -74,7 +74,7 @@ void generate_simulation_turn_report(const Factory& f, std::ostream& os, Time T)
             }
 
             if(worker->get_sending_buffer()){
-                os << "SBuffer: #" << worker->get_sending_buffer() << std::endl;
+                os << "SBuffer: #" << worker->get_sending_buffer()->get_id() << std::endl;
             }
             else{
                 os << "SBuffer: (empty)" << std::endl;
