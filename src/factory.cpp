@@ -38,10 +38,10 @@ bool Factory::is_consistent() const {
     std::map<const PackageSender*, NodeColor> color;
 
     for (auto &r : ramps_) {
-        color.insert(std::pair<*PackageSender, NodeColor>(&r, NodeColor::UNVISITED));
+        color.insert(std::pair<PackageSender*, NodeColor>(&r, NodeColor::UNVISITED));
     }
     for (auto &w : workers_) {
-        color.insert(std::pair<*PackageSender, NodeColor>(&w, NodeColor::UNVISITED));
+        color.insert(std::pair<PackageSender*, NodeColor>(&w, NodeColor::UNVISITED));
     }
 
     try {
@@ -78,6 +78,51 @@ void Factory::do_work(Time t) {
     }
 }
 
+ParsedLineData parse_line (const std::string& line) {
+    std::vector<std::string> tokens;
+    std::string token;
+
+    std::istringstream token_stream(line);
+    char delimiter = ' ';
+
+    while (std::getline(token_stream, token, delimiter)) {
+        tokens.push_back(token);
+    }
+
+    std::map<std::string, ElementType> types = {{"LOADING_RAMP",ElementType::LOADING_RAMP}, {"WORKER",ElementType::WORKER},
+                                                {"STOREHOUSE",ElementType::STOREHOUSE}, {"LINK",ElementType::LINK}};
+
+    ElementType type;
+    bool is_suitable = false;
+    for (auto& x : types) {
+        if (tokens[0] == x.first) {
+            type = x.second;
+            is_suitable = true;
+        }
+    }
+
+    if (!is_suitable) {
+        throw std::logic_error("Not suitable type");
+    }
+
+    ParsedLineData parsed_line;
+    parsed_line.element_type = type;
+
+    tokens.erase(tokens.begin());
+    std::pair<std::string, std::string> pair;
+    for (auto& i : tokens) {
+        for (std::size_t j = 0; j < i.size(); ++j) {
+            if (i[j] == '=') {
+                pair.first = i.substr(0, j);
+                pair.second = i.substr(j + 1, i.size() - j - 1);
+            }
+            parsed_line.parameters.insert(pair);
+        }
+    }
+
+    return parsed_line;
+}
+
 Factory load_factory_structure(std::istream& is){
     Factory factory;
     std::string line;
@@ -90,7 +135,7 @@ Factory load_factory_structure(std::istream& is){
         if (parsed_line.element_type == ElementType::LOADING_RAMP) {
             Ramp r = Ramp(std::stoi(parsed_line.parameters["id"]),
                           std::stoul(parsed_line.parameters["delivery-interval"]));
-            factory.add_ramp(std::move(r));
+            factory.add_ramp(std::move(r));               
         }
         else if (parsed_line.element_type == ElementType::WORKER) {
             PackageQueueType queue_type;
@@ -108,7 +153,7 @@ Factory load_factory_structure(std::istream& is){
             Storehouse s = Storehouse(std::stoi(parsed_line.parameters["id"]));
             factory.add_storehouse(std::move(s));
         }
-        else if (parsed_line.element_type == ElementType::LiNK){
+        else if (parsed_line.element_type == ElementType::LINK){
             std::string source_pair = parsed_line.parameters["src"];
             std::string source_type;
             std::string source_id;
@@ -127,20 +172,20 @@ Factory load_factory_structure(std::istream& is){
                     receiver_id = destination_pair.substr(i + 1, destination_pair.size() - i - 1);
                 }
             }
-            if (source_type == "ramp" && receiver_type == "worker") {
-                Ramp& r - *(factory.find_ramp_by_id(std::stoi(source_id)));
+            if (source_type == "ramp" && receiver_type == 'worker') {
+                Ramp& r = *(factory.find_ramp_by_id(std::stoi(source_id)));
                 r.receiver_preferences_.add_receiver(&(*(factory.find_worker_by_id(std::stoi(receiver_id)))));
             }
-            else if (source_type == "ramp" && receiver_type == "store") {
-                Ramp& r - *(factory.find_ramp_by_id(std::stoi(source_id)));
+            else if (source_type == "ramp" && receiver_type == 'store') {
+                Ramp& r = *(factory.find_ramp_by_id(std::stoi(source_id)));
                 r.receiver_preferences_.add_receiver(&(*(factory.find_storehouse_by_id(std::stoi(receiver_id)))));
             }
-            else if (source_type == "worker" && receiver_type == "worker") {
-                Worker& w - *(factory.find_worker_by_id(std::stoi(source_id)));
+            else if (source_type == "worker" && receiver_type == 'worker') {
+                Worker& w = *(factory.find_worker_by_id(std::stoi(source_id)));
                 r.receiver_preferences_.add_receiver(&(*(factory.find_worker_by_id(std::stoi(receiver_id)))));
             }
-            else if (source_type == "worker" && receiver_type == "store") {
-                Worker& w - *(factory.find_worker_by_id(std::stoi(source_id)));
+            else if (source_type == "worker" && receiver_type == 'store') {
+                Worker& w = *(factory.find_worker_by_id(std::stoi(source_id)));
                 r.receiver_preferences_.add_receiver(&(*(factory.find_storehouse_by_id(std::stoi(receiver_id)))));
             }
         }
@@ -188,3 +233,5 @@ void save_factory_structure(Factory& factory, std::ostream& os) {
     }
     os.flush();
 }
+
+#endif //NETSIM_FACTORY_HPP
