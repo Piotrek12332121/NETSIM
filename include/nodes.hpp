@@ -123,6 +123,16 @@ public:
     [[nodiscard]] const_iterator cbegin() const override { return queue->cbegin();};
     [[nodiscard]] const_iterator cend() const override { return queue->cend();};
 
+    PackageQueue* get_queue(void) const
+    {
+        return queue.get();
+    }
+
+    std::optional<Package> get_processing_buffer() const
+    {
+        return processing
+    }
+
 private:
     ElementID id_;
     TimeOffset pd_;
