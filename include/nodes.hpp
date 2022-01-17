@@ -21,22 +21,21 @@ public:
 };
 
 
-class Storehouse : public IPackageReceiver, public IPackageStockpile{
+class Storehouse : public IPackageReceiver{
 public:
+    using const_iterator = std::list<Package>::const_iterator;
+    using iterator = std::list<Package>::iterator;
+
     explicit Storehouse(ElementID id, std::unique_ptr<IPackageStockpile> d =
             std::make_unique<PackageQueue>(PackageQueueType::LIFO)) :
             id_(id), ptr_(std::move(d)) {};
 
     Storehouse(Storehouse&&) = default;
 
-    void push(Package &&aPackage) override;
-    bool empty() const override;
-    size_t size() const override;
-
-    iterator begin() override {return ptr_->begin();}
-    [[nodiscard]] const_iterator cbegin() const override {return ptr_->cbegin();}
-    iterator end() override {return ptr_->end();}
-    [[nodiscard]] const_iterator cend() const override {return ptr_->cend();}
+    iterator begin() {return ptr_->begin();}
+    [[nodiscard]] const_iterator cbegin() const {return ptr_->cbegin();}
+    iterator end() {return ptr_->end();}
+    [[nodiscard]] const_iterator cend() const {return ptr_->cend();}
 
     void receive_package(Package&& p) override {ptr_->push(std::move(p));}
     [[nodiscard]] ElementID get_id() const override {return id_;}
@@ -78,11 +77,14 @@ private:
 class PackageSender   //TODO: do poprawy wysypuje std::optional
 {
 public:
+    using const_iterator = std::list<Package>::const_iterator;
+    using iterator = std::list<Package>::iterator;
+
     //PackageSender(PackageSender&&)=default;
 
     void send_package();
 
-    [[nodiscard]] std::optional<Package> get_sending_buffer() const {return bucket;}
+    [[nodiscard]] std::optional<Package>& get_sending_buffer() {return bucket;}
 
     ReceiverPreferences receiver_preferences_;
 
@@ -94,17 +96,11 @@ private:
 };
 
 
-class Worker : public PackageSender, public IPackageReceiver, public IPackageQueue{
+class Worker : public PackageSender, public IPackageReceiver{
 public:
     using queue_t = std::unique_ptr<PackageQueue>;
 
     Worker(ElementID id, TimeOffset pd, std::unique_ptr<PackageQueue> q);
-
-    void push(Package&& aPackage) override;
-    bool empty() const override;
-    size_t size() const override;
-    PackageQueueType get_queue_type() const override;
-    Package pop() override;
 
     void do_work(Time t);
 
@@ -118,20 +114,14 @@ public:
 
     [[nodiscard]] ElementID get_id() const override { return id_;}
 
-    iterator begin() override { return queue->begin(); };
-    iterator end() override { return queue->end();};
-    [[nodiscard]] const_iterator cbegin() const override { return queue->cbegin();};
-    [[nodiscard]] const_iterator cend() const override { return queue->cend();};
+    iterator begin()  { return queue->begin(); };
+    iterator end() { return queue->end();};
+    [[nodiscard]] const_iterator cbegin() const { return queue->cbegin();};
+    [[nodiscard]] const_iterator cend() const { return queue->cend();};
 
-    PackageQueue* get_queue(void) const
-    {
-        return queue.get();
-    }
+    [[nodiscard]] PackageQueue* get_queue() const{return queue.get();}
 
-    std::optional<Package> get_processing_buffer() const
-    {
-        return processing
-    }
+    [[nodiscard]] std::optional<Package>& get_processing_buffer() {return processing;}
 
 private:
     ElementID id_;

@@ -53,8 +53,10 @@ public:
     void remove_worker(ElementID id) {workers_.remove_by_id(id);}
     NodeCollection<Worker>::iterator find_worker_by_id(ElementID id) {return workers_.find_by_id(id);}
     [[nodiscard]] NodeCollection<Worker>::const_iterator find_worker_by_id(ElementID id) const {return workers_.find_by_id(id);}
-    [[nodiscard]] NodeCollection<Worker>::const_iterator worker_cbegin() const {return workers_.begin();}
-    [[nodiscard]] NodeCollection<Worker>::const_iterator worker_cend() const {return workers_.begin();}
+    [[nodiscard]] NodeCollection<Worker>::iterator worker_begin() {return workers_.begin();}
+    [[nodiscard]] NodeCollection<Worker>::iterator worker_end() {return workers_.begin();}
+    [[nodiscard]] NodeCollection<Worker>::const_iterator worker_cbegin() const {return workers_.cbegin();}
+    [[nodiscard]] NodeCollection<Worker>::const_iterator worker_cend() const {return workers_.cbegin();}
 
     void add_storehouse(Storehouse&& s) {storehouses_.add(std::move(s));}
     void remove_storehouse(ElementID id) {storehouses_.remove_by_id(id);}
@@ -65,7 +67,7 @@ public:
 
     bool has_reachable_storehouse(const PackageSender* sender, std::map<const PackageSender*, NodeColor>& node_colors) const;
 
-    [[nodiscard]] bool is_consistent() const;
+    [[nodiscard]] bool is_consistent();
 
     void do_deliveries(Time t);
 

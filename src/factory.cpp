@@ -2,6 +2,7 @@
 #include "nodes.hpp"
 
 #include <stdexcept>
+#include <sstream>
 
 bool Factory::has_reachable_storehouse(const PackageSender* sender, std::map<const PackageSender*, NodeColor>& node_colors) const {
     if (node_colors.at(sender) == NodeColor::VERIFIED) {
@@ -13,10 +14,8 @@ bool Factory::has_reachable_storehouse(const PackageSender* sender, std::map<con
         throw std::logic_error("Receivers not defined");
     }
 
-    bool different_receiver_than_itself = false;
     for (const auto& receiver : sender->receiver_preferences_) {
         if (receiver.first->get_receiver_type() == ReceiverType::STOREHOUSE) {
-            different_receiver_than_itself = true;
         } else {
             IPackageReceiver* receiver_ptr = receiver.first;
             auto worker_ptr = dynamic_cast<Worker*>(receiver_ptr);
@@ -25,30 +24,30 @@ bool Factory::has_reachable_storehouse(const PackageSender* sender, std::map<con
             if (sendrecv_ptr == sender) {
                 continue;
             }
-            different_receiver_than_itself = true;
 
             if (node_colors.at(sendrecv_ptr) != NodeColor::VISITED) {
                 has_reachable_storehouse(sendrecv_ptr, node_colors);
             }
         }
     }
+    return false;
 }
 
 
 
-bool Factory::is_consistent() {
+bool Factory::is_consistent(){
 
     std::map<const PackageSender*, NodeColor> color;
 
-    for (auto &r : ramps_list_) {
+    for (auto &r : ramps_) {
         color.insert(std::pair<PackageSender*, NodeColor>(&r, NodeColor::UNVISITED));
     }
-    for (auto &w : workers_list_) {
+    for (auto &w : workers_) {
         color.insert(std::pair<PackageSender*, NodeColor>(&w, NodeColor::UNVISITED));
     }
 
     try {
-        for (const auto& r: ramps_list_) {
+        for (const auto& r: ramps_) {
             has_reachable_storehouse(&r, color);
         }
     }
@@ -171,25 +170,25 @@ Factory load_factory_structure(std::istream& is){
             std::string receiver_id;
             for (std::size_t i = 0; i < destination_pair.size(); ++i) {
                 if (destination_pair[i] == '-') {
-                    receiver_type = destination.pair.substr(0, i);
+                    receiver_type = destination_pair.substr(0, i);
                     receiver_id = destination_pair.substr(i + 1, destination_pair.size() - i - 1);
                 }
             }
-            if (source_type == "ramp" && receiver_type == 'worker') {
+            if (source_type == "ramp" && receiver_type == "worker") {
                 Ramp& r = *(factory.find_ramp_by_id(std::stoi(source_id)));
                 r.receiver_preferences_.add_receiver(&(*(factory.find_worker_by_id(std::stoi(receiver_id)))));
             }
-            else if (source_type == "ramp" && receiver_type == 'store') {
+            else if (source_type == "ramp" && receiver_type == "store") {
                 Ramp& r = *(factory.find_ramp_by_id(std::stoi(source_id)));
                 r.receiver_preferences_.add_receiver(&(*(factory.find_storehouse_by_id(std::stoi(receiver_id)))));
             }
-            else if (source_type == "worker" && receiver_type == 'worker') {
+            else if (source_type == "worker" && receiver_type == "worker") {
                 Worker& w = *(factory.find_worker_by_id(std::stoi(source_id)));
-                r.receiver_preferences_.add_receiver(&(*(factory.find_worker_by_id(std::stoi(receiver_id)))));
+                w.receiver_preferences_.add_receiver(&(*(factory.find_worker_by_id(std::stoi(receiver_id)))));
             }
-            else if (source_type == "worker" && receiver_type == 'store') {
+            else if (source_type == "worker" && receiver_type == "store") {
                 Worker& w = *(factory.find_worker_by_id(std::stoi(source_id)));
-                r.receiver_preferences_.add_receiver(&(*(factory.find_storehouse_by_id(std::stoi(receiver_id)))));
+                w.receiver_preferences_.add_receiver(&(*(factory.find_storehouse_by_id(std::stoi(receiver_id)))));
             }
         }
     }
@@ -237,4 +236,3 @@ void save_factory_structure(Factory& factory, std::ostream& os) {
     os.flush();
 }
 
-#endif //NETSIM_FACTORY_HPP
