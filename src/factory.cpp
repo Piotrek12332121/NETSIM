@@ -40,15 +40,15 @@ bool Factory::is_consistent() {
 
     std::map<const PackageSender*, NodeColor> color;
 
-    for (auto &r : ramps_list_) {
+    for (auto &r : ramps_) {
         color.insert(std::pair<PackageSender*, NodeColor>(&r, NodeColor::UNVISITED));
     }
-    for (auto &w : workers_list_) {
+    for (auto &w : workers_) {
         color.insert(std::pair<PackageSender*, NodeColor>(&w, NodeColor::UNVISITED));
     }
 
     try {
-        for (const auto& r: ramps_list_) {
+        for (const auto& r: ramps_) {
             has_reachable_storehouse(&r, color);
         }
     }
